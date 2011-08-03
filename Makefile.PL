@@ -1,24 +1,15 @@
+use 5.008007;
 use strict;
 use warnings;
-use inc::Module::Install;
-use Module::Install::AuthorTests;
 
-name     'Mojolicious-Plugin-CSRFDefender';
-author   'Yuki Shibazaki <shibayu36@gmail.com>';
-all_from 'lib/Mojolicious/Plugin/CSRFDefender.pm';
+use ExtUtils::MakeMaker;
 
-requires 'Mojolicious' => '1.43';
-requires 'String::Random';
-requires 'Class::Accessor::Fast';
-requires 'Path::Class';
+# We only use core modules, so you shouldn't have to install anything besides
+# # Perl 5.8.7!
 
-test_requires 'Test::More';
-test_requires 'Test::Class';
-test_requires 'Mojolicious::Lite';
-test_requires 'Test::Mojo';
-
-recursive_author_tests('xt');
-
-auto_install;
-WriteAll;
-
+WriteMakefile(
+	NAME          => 'Mojolicious::Plugin::CSRFDefender',
+	VERSION_FROM  => 'lib/Mojolicious/Plugin/CSRFDefender.pm',
+	PREREQ_PM     => { Mojolicious => '1.43' },
+	AUTHOR        => 'Yuki Shibazaki <shibayu36@gmail.com>',
+);

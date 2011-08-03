@@ -6,8 +6,8 @@ use Carp;
 
 our $VERSION = '0.0.6';
 
-use base qw(Mojolicious::Plugin Class::Accessor::Fast);
-__PACKAGE__->mk_accessors(qw(
+use base qw(Mojolicious::Plugin);
+__PACKAGE__->attr([qw(
     parameter_name
     session_key
     token_length
@@ -15,10 +15,7 @@ __PACKAGE__->mk_accessors(qw(
     error_content
     error_template
     onetime
-));
-
-use String::Random;
-use Path::Class;
+)]);
 
 sub register {
     my ($self, $app, $conf) = @_;
@@ -44,7 +41,7 @@ sub register {
         unless ($self->_validate_csrf($c)) {
             my $content;
             if ($self->error_template) {
-                my $file = file($self->error_template);
+                my $file = Mojo::Asset::File->new->path($self->error_template);
                 $content = $file->slurp;
             }
             else {
@@ -100,7 +97,8 @@ sub _get_csrf_token {
     my $length = $self->token_length;
     return $token if $token;
 
-    $token = String::Random::random_regex("[a-zA-Z0-9_]{$length}");
+    my @chars=('a'..'z','A'..'Z','0'..'9','_');
+    $token .= $chars[rand @chars] foreach (1..$length);
     $c->session($key => $token);
     return $token;
 }
@@ -161,7 +159,7 @@ this becomes
 
 =head2 input check
 
-For every POST requests, this module checks input parameters contain the collect token parameter. If not found, throws 403 Forbidden.
+For every POST requests, this module checks input parameters contain the correct token parameter. If not found, throws 403 Forbidden.
 
 =head1 OPTIONS
 
